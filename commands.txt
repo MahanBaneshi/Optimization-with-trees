@@ -1,0 +1,2 @@
+g++ -std=c++17 -o skyline dynamic_skyline.cpp
+./skyline small.input small.times
