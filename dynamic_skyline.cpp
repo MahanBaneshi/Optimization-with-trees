@@ -29,15 +29,12 @@ private:
         BJRNode(Point p) : point(move(p)), parent(nullptr) {}
     };
 
-    // Data structures for standard method
     shared_ptr<BJRNode> root;
     unordered_map<int, shared_ptr<BJRNode>> active_nodes;
 
-    // Data structures for lazy method
     shared_ptr<BJRNode> lazy_root;
     unordered_map<int, shared_ptr<BJRNode>> lazy_active_nodes;
 
-    // Common data structures
     int dimensions;
     int lazy_depth = 3;
     map<int, vector<shared_ptr<BJRNode>>> injection_schedule;
@@ -56,7 +53,6 @@ private:
         return strictly_better;
     }
 
-    // Standard injection method (unchanged)
     void inject_node(shared_ptr<BJRNode> node)
     {
         inject_helper(root, node);
@@ -103,7 +99,6 @@ private:
     {
         if (current_depth < lazy_depth)
         {
-            // Find the child with minimum descendants that dominates new_node
             shared_ptr<BJRNode> best_child = nullptr;
             size_t min_descendants = numeric_limits<size_t>::max();
 
@@ -127,11 +122,9 @@ private:
             }
         }
 
-        // Add as child if no suitable parent found
         new_node->parent = parent;
         parent->children.push_back(new_node);
 
-        // Check for dominated children
         for (auto it = parent->children.begin(); it != parent->children.end();)
         {
             if (*it != new_node && dominates(new_node->point, (*it)->point))
@@ -172,12 +165,10 @@ private:
         auto node = it->second;
         auto parent = node->parent;
 
-        // Remove node from parent's children
         parent->children.erase(
             remove(parent->children.begin(), parent->children.end(), node),
             parent->children.end());
 
-        // Re-inject all children
         for (auto &child : node->children)
         {
             child->parent = nullptr;
@@ -195,7 +186,7 @@ private:
         vector<int> skyline_ids;
         for (const auto &child : current_root->children)
         {
-            skyline_ids.push_back(child->point.id - 1); // 0-based index
+            skyline_ids.push_back(child->point.id - 1); 
         }
         sort(skyline_ids.begin(), skyline_ids.end());
         return skyline_ids;
@@ -367,7 +358,7 @@ int main(int argc, char *argv[])
     try
     {
         string coords_file = argv[1];
-        int dimensions = 4; // Default to small
+        int dimensions = 4; 
 
         if (coords_file.find("medium") != string::npos)
         {

@@ -23,18 +23,21 @@ struct Node {
 };
 
 bool dominates(const Point& a, const Point& b) {
-    bool strictly_better = false;
+    bool Definitely_better = false;
     for (size_t i = 0; i < a.coords.size(); ++i) {
         if (a.coords[i] > b.coords[i]) return false;
-        if (a.coords[i] < b.coords[i]) strictly_better = true;
+        if (a.coords[i] < b.coords[i]) Definitely_better = true;
     }
-    return strictly_better;
+    return Definitely_better;
 }
 
-string trim(const string& s) {
+string triming(const string& s) {
     size_t start = s.find_first_not_of(" \t\r\n");
     size_t end = s.find_last_not_of(" \t\r\n");
-    return (start == string::npos) ? "" : s.substr(start, end - start + 1);
+    if (start != string::npos) {
+        return s.substr(start, end - start + 1);
+    }
+    return "";
 }
 
 bool compare_files(const string& file1, const string& file2) {
@@ -42,17 +45,17 @@ bool compare_files(const string& file1, const string& file2) {
     if (!f1 || !f2) return false;
     string line1, line2;
     while (getline(f1, line1) && getline(f2, line2)) {
-        if (trim(line1) != trim(line2)) return false;
+        if (triming(line1) != triming(line2)) return false;
     }
     return true;
 }
 
 void inject_node(Node* root, Node* new_node) {
-    bool dominated = false;
+    bool is_dominated = false;
     for (auto it = root->children.begin(); it != root->children.end();) {
         if (dominates((*it)->point, new_node->point)) {
             inject_node(*it, new_node);
-            dominated = true;
+            is_dominated = true;
             return;
         } else if (dominates(new_node->point, (*it)->point)) {
             Node* child = *it;
@@ -63,7 +66,7 @@ void inject_node(Node* root, Node* new_node) {
             ++it;
         }
     }
-    if (!dominated) {
+    if (!is_dominated) {
         new_node->parent = root;
         root->children.push_back(new_node);
     }
@@ -126,7 +129,7 @@ int main() {
     map<int, Node*> active;
 
     ofstream out(prefix + ".ndcache.out");
-    if (!out) throw runtime_error("Cannot open output file");
+    if (!out) throw runtime_error("We can't open output file");
 
     for (int t = 0; t <= T; ++t) {
         if (insert_at.count(t)) {
@@ -151,8 +154,11 @@ int main() {
     }
     out.close();
 
-    bool same = compare_files(prefix + ".ndcache.out", prefix + ".refout");
-    cout << (same ? " Output matches reference." : " Output does NOT match reference!") << endl;
+    bool same = compare_files(prefix + ".ndcache.out", prefix + ".refout");if (same) {
+        cout << " Output matches reference." << endl;
+    } else {
+        cout << " Output does NOT match reference!" << endl;
+    }
 
     return 0;
 }
